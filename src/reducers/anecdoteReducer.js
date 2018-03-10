@@ -34,4 +34,11 @@ const reducer = (store = initialState, action) => {
   return store
 }
 
+export const createNew = (content) => {
+  return {
+    type: 'CREATE',
+    content
+  }
+}
+
 export default reducer
