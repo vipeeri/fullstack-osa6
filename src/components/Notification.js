@@ -1,32 +1,12 @@
 import React from 'react'
 import notificationReducer from './../reducers/notificationReducer'
 import PropTypes from 'prop-types'
-import { remove } from './../reducers/notificationReducer'
+import { connect } from 'react-redux'
+import { actionCreatorNotification } from './../reducers/notificationReducer'
 
 
 
 class Notification extends React.Component {
-
-  componentDidMount() {
-    const { store } = this.context
-    this.unsubscribe = store.subscribe(() =>
-      this.forceUpdate()
-    )
-  
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-
-  isNull() {
-    if (this.context.store.getState().notification) {
-      return this.context.store.getState().notification
-    }   setTimeout(() => {
-      this.context.store.dispatch(remove())
-    }, 5000)
-
-  }
 
   render() {
 
@@ -36,18 +16,32 @@ class Notification extends React.Component {
       borderWidth: 1
     }
 
+    setTimeout(() => {
+      this.props.createNot('', '')
+    }, 5000)
     return (
 
       <div style={style}>
-      {this.isNull()}
+      {this.props.notification}
       </div>
     )
 
   }
 }
 
-Notification.contextTypes = {
-  store: PropTypes.object
+const mapStateToProps = (state) => {
+  return {
+    notification: state.notification
+  }
 }
 
-export default Notification
+const mapDispatchToProps = {
+  createNot: actionCreatorNotification.createNewNot
+}
+
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Notification)

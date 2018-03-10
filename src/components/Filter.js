@@ -1,11 +1,11 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { createNewChar } from './../reducers/filterReducer'
+import { connect } from 'react-redux'
 
 class Filter extends React.Component {
     handleChange = (event) => {
       // input-kentän arvo muuttujassa event.target.value
-      this.context.store.dispatch(createNewChar(event.target.value))
+      this.props.newChar(event.target.value)
 
       // this.context.setStage(event.target.value)
     }
@@ -23,8 +23,22 @@ class Filter extends React.Component {
     }
   }
 
-  Filter.contextTypes = {
-    store: PropTypes.object
+ 
+  
+  const mapDispatchToProps = {
+    newChar: createNewChar
+  }
+
+  const mapStateToProps = (state) => {
+    return {
+      filter: state.filter
+    }
   }
   
-  export default Filter
+
+ 
+  
+  export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ) (Filter)

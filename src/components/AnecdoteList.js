@@ -1,61 +1,31 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { createNewNot } from './../reducers/notificationReducer'
+import { actionCreatorNotification } from './../reducers/notificationReducer'
+import { createNew } from './../reducers/anecdoteReducer'
+import { connect } from 'react-redux'
+import { actionCreatorAnecdote } from './../reducers/anecdoteReducer'
 
 
 class AnecdoteList extends React.Component {
 
-  componentDidMount() {
-    const { store } = this.context
-    this.unsubscribe = store.subscribe(() =>
-      this.forceUpdate()
-    )
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-
-  handleDispatchAndNotification(anecdote) {
-    const youDid = 'You voted: '
-    this.context.store.dispatch({ type: 'VOTE', id: anecdote.id })
-    this.context.store.dispatch(createNewNot(youDid, anecdote.content))
-  }
-
-  handleFilter(anecdote) {
-    if (anecdote.content.includes(this.context.store.getState().filter)) {
-      return anecdote.content
-    }
-  }
-
-  buttonRender(e) {
-    if (e.content.includes(this.context.store.getState().filter)) {
-
-    return (
-      <div>
-      has {e.votes}
-      <button onClick={() => 
-        this.handleDispatchAndNotification(e)
-        }>
-        VOTE
-        </button>
-        </div>
-  )}
-  }
-
   render() {
-    const anecdotes = this.context.store.getState().anecdotes
-
   
- 
     return (
       <div>
         <h2>Anecdotes</h2>
-        {anecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
+        {this.props.visibleAnecdotes.map(anecdote =>
           <div key={anecdote.id}>
             <div>
-              {this.handleFilter(anecdote)}
-              {this.buttonRender(anecdote)}
+              {anecdote.content}
+              <div>
+             has: {anecdote.votes}
+             </div>
+              <button onClick={() => {
+      this.props.anecdoteVoteCreate(anecdote)
+      this.props.notificationCreate('you voted: ', anecdote.content)
+              }
+      }>
+      VOTE
+      </button>
             </div>
           </div>
         )}
@@ -64,8 +34,29 @@ class AnecdoteList extends React.Component {
   }
 }
 
-AnecdoteList.contextTypes = {
-  store: PropTypes.object
+const anecdotesToShow = (anecdotes, filter) => {
+  const sorted = anecdotes.filter(anecdote =>
+    anecdote.content.includes(filter)
+  )
+    return (
+      sorted.sort((a, b) => b.votes - a.votes)
+    )
+  
 }
 
-export default AnecdoteList
+const mapStateToProps = (state) => {
+  return {
+    visibleAnecdotes: anecdotesToShow(state.anecdotes, state.filter)
+  }
+}
+
+
+const mapDispatchToProps = {
+  anecdoteVoteCreate: actionCreatorAnecdote.voteAnecdote,
+  notificationCreate: actionCreatorNotification.createNewNot
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+) (AnecdoteList)
