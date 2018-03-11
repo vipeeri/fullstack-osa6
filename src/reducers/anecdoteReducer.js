@@ -31,7 +31,14 @@ export const actionCreatorAnecdote = {
 
 }
 
-const reducer = (store = initialState, action) => {
+export const anecdoteInitialization = (data) => {
+  return {
+    type: 'INIT_ANEC',
+    data
+  }
+}
+
+const reducer = (store = [], action) => {
   if (action.type==='VOTE') {
     const old = store.filter(a => a.id !==action.id)
     const voted = store.find(a => a.id === action.id)
@@ -41,6 +48,9 @@ const reducer = (store = initialState, action) => {
   if (action.type === 'CREATE') {
 
     return [...store, { content: action.content, id: getId(), votes:0 }]
+  }
+  if (action.type === 'INIT_ANEC') {
+    return action.data
   }
 
   return store
